@@ -1,0 +1,13 @@
+# Example samplesheet for the targeted sequencing pipelines.
+#
+# Three columns: read1, read2, sample_name. Replace the placeholder
+# paths with the FASTQ files downloaded from CNSA (CNP0008752).
+read1	read2	sample_name
+<path-to-raw-fastq>/Sample_SQ24031182-NU-con-1_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-con-1_R2.fastq.gz	con_1
+<path-to-raw-fastq>/Sample_SQ24031182-NU-con-2_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-con-2_R2.fastq.gz	con_2
+<path-to-raw-fastq>/Sample_SQ24031182-NU-con-3_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-con-3_R2.fastq.gz	con_3
+<path-to-raw-fastq>/Sample_SQ24031182-NU-exp-1_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-exp-1_R2.fastq.gz	exp_1
+<path-to-raw-fastq>/Sample_SQ24031182-NU-exp-2_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-exp-2_R2.fastq.gz	exp_2
+<path-to-raw-fastq>/Sample_SQ24031182-NU-exp-3_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-exp-3_R2.fastq.gz	exp_3
+<path-to-raw-fastq>/Sample_SQ24031182-NU-pbs-1_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-pbs-1_R2.fastq.gz	pbs-1
+<path-to-raw-fastq>/Sample_SQ24031182-NU-pbs-2_R1.fastq.gz	<path-to-raw-fastq>/Sample_SQ24031182-NU-pbs-2_R2.fastq.gz	pbs-2

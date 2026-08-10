@@ -1,0 +1,26 @@
+# Example Snakemake config for the translocation pipeline
+# (pipeline/target_analyse_2.smk).
+#
+# All paths are relative to the repository root. Adjust to your
+# local data layout (see data/README.md).
+
+# Paths to the input tables (see samples.tsv and target_primers.csv
+# in this directory).
+samples_table: "configs/target_sequence_240501/samples.tsv"
+primers_table: "configs/target_sequence_240501/target_primers.csv"
+
+# Batch name; results are written under
+# data/processed/<project_name> and data/final/<project_name>.
+project_name: "targetsequence_20240501"
+
+# Path to the GRCm39 BWA index (external reference data, not shipped
+# with this repository). Must point to the prefix used by `bwa index`.
+genome_index: "path/to/GRCm39_bwa_index"
+
+# Conda environment used by the script rules (created from environment.yml).
+conda_env: "long-term-crispr-in-liver"
+
+# Analysis parameters
+fastp_trim: true
+fastp_merge: false
+primer_filter_strategy: "cover"
