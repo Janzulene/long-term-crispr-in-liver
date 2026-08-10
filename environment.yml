@@ -24,12 +24,16 @@ dependencies:
   - conda-forge::r-base
   - conda-forge::r-circlize
   - conda-forge::r-complexupset
+  - conda-forge::r-conflicted
   - conda-forge::r-ggrastr
   - conda-forge::r-ggvenndiagram # venn/upset plots
+  - conda-forge::r-ggplotify
+  - conda-forge::r-glue
   - conda-forge::r-httpgd
   - conda-forge::r-irkernel
   - conda-forge::r-languageserver
   - conda-forge::r-openxlsx
+  - conda-forge::r-patchwork
   - conda-forge::r-tidyverse
   - conda-forge::r-vcfr
 
