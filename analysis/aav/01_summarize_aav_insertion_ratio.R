@@ -3,16 +3,16 @@
 #
 # Collects the per-sample AAV insertion ratios produced by
 # target_analyse_aav.smk and writes:
-#   - data/final/targetsequence_20240501/aav_insertion_ratio.tsv
+#   - data/final/targetsequence/aav_insertion_ratio.tsv
 #     (overall ratio, using the "con" reference sgRNA)
-#   - data/final/targetsequence_20240501/aav_insertion_ratio.2.tsv
+#   - data/final/targetsequence/aav_insertion_ratio.2.tsv
 #     (per-sgRNA ratio relative to the editing-evidence reads)
 #
 # Article references:
 #   - Fig 2K (AAV integration detection): upstream data tables
 #
 # Usage:
-#   Rscript analysis/aav/summarize_aav_insertion_ratio.R
+#   Rscript analysis/aav/01_summarize_aav_insertion_ratio.R
 # ══════════════════════════════════════════════════════════════════════════════
 
 library(conflicted)
@@ -21,8 +21,11 @@ conflicts_prefer(dplyr::filter)
 
 library(tidyverse)
 
-AAV_RESPATH <- "data/processed/targetsequence_20240501_aav/mapping"
-FINAL_DIR   <- "data/final/targetsequence_20240501"
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
+
+AAV_RESPATH <- file.path(TS_PROCESSED_AAV, "mapping")
+FINAL_DIR   <- TS_FINAL
 
 # ---------- method 1: overall ratio ----------
 
@@ -85,6 +88,6 @@ p2 <- (
     )
 )
 
-dir.create("reports/figures/targetsequence_20240501", showWarnings = FALSE, recursive = TRUE)
-ggsave("reports/figures/targetsequence_20240501/aav_insertion_ratio.svg",  p1, width = 8, height = 4)
-ggsave("reports/figures/targetsequence_20240501/aav_insertion_ratio.2.svg", p2, width = 8, height = 4)
+dir.create(AAV_FIGURES, showWarnings = FALSE, recursive = TRUE)
+ggsave(file.path(AAV_FIGURES, "aav_insertion_ratio.svg"),  p1, width = 8, height = 4)
+ggsave(file.path(AAV_FIGURES, "aav_insertion_ratio.2.svg"), p2, width = 8, height = 4)

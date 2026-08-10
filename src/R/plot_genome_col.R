@@ -1,5 +1,6 @@
 # ============================================================
-# Genome coverage plotting library (used by plot_aav.R, Fig. 2K)
+# Genome coverage plotting library (used by analysis/aav/02_plot_aav.R
+# and pipeline/scripts/aav_plot_insertion.R, Fig. 2K)
 #
 # Provides:
 #   - scale_y_log10_plus1()      log10(x + 1) y transform for ggplot2

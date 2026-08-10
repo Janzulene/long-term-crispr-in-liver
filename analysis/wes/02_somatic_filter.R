@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# WES2 somatic mutation analysis — step 2/6: somatic filtering
+# WES somatic mutation analysis — step 2/7: somatic filtering
 #
 # Two-stage filtering of the Mutect2 calls:
 #   1. Initial somatic filter (allele-frequency + quality + germline
@@ -34,9 +34,10 @@ library(glue)
 library(magrittr)
 library(tidyverse)
 
-source("src/R/utils.R")  # .add_mut_id()
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
 
-WES_PROCESSED <- "data/processed/WES_20250105_analysis"
+source("src/R/utils.R")  # .add_mut_id()
 
 MIN_AF <- 0.1
 

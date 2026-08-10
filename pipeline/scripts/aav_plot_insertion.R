@@ -4,7 +4,7 @@
 #   - coverage across the AAV2 vector
 library(tidyverse)
 
-source("analysis/aav/plot_genome_col.R")
+source("src/R/plot_genome_col.R")
 
 full_genome_cov_path <- snakemake@input[["full_genome_cov"]]
 genome_cov_path      <- snakemake@input[["genome_cov"]]

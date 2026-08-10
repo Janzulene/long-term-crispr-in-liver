@@ -9,9 +9,10 @@
 #      strand, complexity)
 #   4. translocation detection (check_translocation)
 #   5. short-indel counting (count_indel_pairs)
-#   6. final translocation table (filter_translocation)
+#   6. on-target per-position depth (for the circos plots)
+#   7. final translocation table (filter_translocation)
 #
-# Config keys (see configs/target_sequence_240501/snakemake_config.yaml):
+# Config keys (see configs/target_sequence/snakemake_config.yaml):
 #   samples_table     : TSV with columns read1, read2, sample_name
 #   primers_table     : CSV with columns name, chr, pos, length, strand
 #   project_name      : batch name used under data/processed and data/final
@@ -61,7 +62,7 @@ if GENOME_INDEX is None:
 COND_ENV = config.get("conda_env", "long-term-crispr-in-liver")
 
 # Input tables
-sample_df     = pd.read_table(params["samples_table"])  # three columns: read1, read2, sample_name
+sample_df     = pd.read_table(params["samples_table"], sep="\t")  # three columns: read1, read2, sample_name
 processed_dir = Location.processed_data / params["project_name"]
 final_dir     = Location.final_data / params["project_name"]
 primers_df    = pd.read_csv(config["primers_table"], dtype={"chr": str})
@@ -111,6 +112,11 @@ rule all:
         ],
         [
             str(processed_dir / sample_name / primer_name / f"indel_stat__{filter_strategy}.tsv")
+            for sample_name in sample_df.sample_name
+            for primer_name in primers_df.name
+        ],
+        [
+            str(processed_dir / sample_name / primer_name / f"intarget__{filter_strategy}.depth")
             for sample_name in sample_df.sample_name
             for primer_name in primers_df.name
         ],
@@ -213,6 +219,18 @@ rule check_translocation:
         min_map_length = params["min_map_length"]
     script:
         "scripts/check_translocations.py"
+# ---
+
+# On-target per-position depth (used by the circos plots, Fig 2L)
+rule on_target_depth:
+    input:
+        bam = str(processed_dir / "{sample_name}" / "{primer_name}" / f"intarget__{filter_strategy}.sorted.bam")
+    output:
+        depth = str(processed_dir / "{sample_name}" / "{primer_name}" / f"intarget__{filter_strategy}.depth")
+    shell:
+        '''
+        samtools depth {input.bam} > {output.depth}
+        '''
 # ---
 
 # Short-indel counting on the on-target reads

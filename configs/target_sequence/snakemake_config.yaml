@@ -6,12 +6,12 @@
 
 # Paths to the input tables (see samples.tsv and target_primers.csv
 # in this directory).
-samples_table: "configs/target_sequence_240501/samples.tsv"
-primers_table: "configs/target_sequence_240501/target_primers.csv"
+samples_table: "configs/target_sequence/samples.tsv"
+primers_table: "configs/target_sequence/target_primers.csv"
 
 # Batch name; results are written under
 # data/processed/<project_name> and data/final/<project_name>.
-project_name: "targetsequence_20240501"
+project_name: "targetsequence"
 
 # Path to the GRCm39 BWA index (external reference data, not shipped
 # with this repository). Must point to the prefix used by `bwa index`.
@@ -22,5 +22,4 @@ conda_env: "long-term-crispr-in-liver"
 
 # Analysis parameters
 fastp_trim: true
-fastp_merge: false
 primer_filter_strategy: "cover"

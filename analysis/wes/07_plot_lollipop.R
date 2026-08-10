@@ -1,22 +1,26 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # Lollipop Plot — Somatic Mutations (ggplot2, standalone)
 #
-# Reads mutation_detail.{gene,cds}.tsv and produces publication-ready lollipop
-# figures.  No external R files needed beyond tidyverse.
+# Reads mutation_detail.{gene,cds}.tsv (step 6 output) and produces
+# publication-ready lollipop figures.  No external R files needed beyond
+# tidyverse.
 #
 # Usage:
-#   Rscript analysis/wes/plot_lollipop.R
+#   Rscript analysis/wes/07_plot_lollipop.R
 #   or source in RStudio for interactive use.
 # ══════════════════════════════════════════════════════════════════════════════
 
 library(tidyverse)
+
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Parameters — adjust these before running
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Input files
-DATA_DIR       <- "data/final/WES_20250105"
+DATA_DIR       <- WES_FINAL
 GENE_TSV       <- file.path(DATA_DIR, "mutation_detail.gene.tsv")
 CDS_TSV        <- file.path(DATA_DIR, "mutation_detail.cds.tsv")
 GENE_WIDTHS    <- file.path(DATA_DIR,  "gene_widths.tsv")

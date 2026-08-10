@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# WES2 somatic mutation analysis — step 4/6: mutation burden
+# WES somatic mutation analysis — step 4/7: mutation burden
 #
 # Counts distinct mutations (CHROM/POS/REF/ALT) per sample for the raw
 # calls and for the hard-filtered somatic calls, and saves the
@@ -7,7 +7,7 @@
 #
 # Article references:
 #   - Table S4: mutation burden
-#     (data/final/WES_20250105/mutation_burden.tsv)
+#     (data/final/WES/mutation_burden.tsv)
 #
 # Usage:
 #   Rscript analysis/wes/04_mutation_burden.R
@@ -30,9 +30,8 @@ library(RColorBrewer)
 library(magrittr)
 library(tidyverse)
 
-WES_PROCESSED <- "data/processed/WES_20250105_analysis"
-WES_FINAL     <- "data/final/WES_20250105"
-FIG_PATH      <- "reports/figures/WES_20250105"
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
 
 SAMPLE_ORDER <- c(
     str_c("PBS_Rep", seq(3)),
@@ -89,18 +88,18 @@ plot_mut_burden <- function(samples, title = "Mutation Burden") {
 # Burden plots + table
 # ══════════════════════════════════════════════════════════════════════════════
 
-dir.create(FIG_PATH, showWarnings = FALSE, recursive = TRUE)
+dir.create(WES_FIGURES, showWarnings = FALSE, recursive = TRUE)
 
 # All mutations (raw unfiltered)
 ggsave(
-    file.path(FIG_PATH, "mutation_burden.raw.svg"),
+    file.path(WES_FIGURES, "mutation_burden.raw.svg"),
     plot_mut_burden(samples),
     width = 8, height = 4
 )
 
 # Hard-filtered somatic only
 ggsave(
-    file.path(FIG_PATH, "mutation_burden.somatic_hard.svg"),
+    file.path(WES_FIGURES, "mutation_burden.somatic_hard.svg"),
     plot_mut_burden(samples.somatic_hard, title = "Mutation Burden (Somatic Hard)"),
     width = 8, height = 4
 )

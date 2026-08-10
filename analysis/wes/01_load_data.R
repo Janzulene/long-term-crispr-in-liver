@@ -1,18 +1,18 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# WES2 somatic mutation analysis — step 1/6: load data
+# WES somatic mutation analysis — step 1/7: load data
 #
 # Loads sequencing depth, reference annotations (GRCm39 GTF, cancer gene
 # list) and the Mutect2 + VEP annotated variant tables, then saves them
 # as RDS files consumed by the downstream analysis steps.
 #
 # Article references:
-#   - Table S4: sequencing depth (data/final/WES_20250105/sequencing_depth.tsv)
+#   - Table S4: sequencing depth (data/final/WES/sequencing_depth.tsv)
 #   - Fig 2I / Table S5 / lollipop figure: upstream data (samples.rds)
 #
 # External data (not shipped with the repository):
 #   - GRCm39 gene annotation GTF (GENCODE vM33 / Ensembl 110) — set
 #     GRCm39_GTF_PATH below
-#   - cancer gene list: data/raw/WES_20240323/cancer_list.csv
+#   - cancer gene list: data/raw/WES/cancer_list.csv
 #   - Mutect2 + VEP annotated VCF tables (sarek 3.4.2 output):
 #     data/processed/WES2_paired_annotate/annotation/mutect2/
 #   - per-sample mean depth tables (samtools depth):
@@ -42,6 +42,9 @@ library(magrittr)
 library(patchwork)
 library(rtracklayer)
 library(tidyverse)
+
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Parameters
@@ -74,20 +77,17 @@ IMPACT_ORDER <- c("HIGH", "MODERATE", "LOW", "MODIFIER")
 
 MIN_AF <- 0.1
 
-# Output directories
-WES_FINAL      <- "data/final/WES_20250105"
-WES_PROCESSED  <- "data/processed/WES_20250105_analysis"
-FIG_PATH       <- "reports/figures/WES_20250105"
-
-DEPTH_TABLE <- file.path("data/processed/WES2_paired/preprocessing/markduplicates")
-VCF_TABLE   <- "data/processed/WES2_paired_annotate/annotation/mutect2"
+# Output directories (defined in src/R/paths.R):
+#   WES_FINAL (data/final/WES), WES_PROCESSED (data/processed/WES_analysis),
+#   WES_FIGURES (reports/figures/WES), SAREK_DEPTH_TABLE, SAREK_VCF_TABLE,
+#   CANCER_GENE_LIST
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 1. Sequencing depth
 # ══════════════════════════════════════════════════════════════════════════════
 
 .read_samtools_stat <- function(sample_name) {
-    stat_path <- str_glue("{DEPTH_TABLE}/{sample_name}/{sample_name}.depth.txt")
+    stat_path <- str_glue("{SAREK_DEPTH_TABLE}/{sample_name}/{sample_name}.depth.txt")
     dt <- data.table::fread(
         stat_path,
         col.names = c("chr", "pos", "depth"),
@@ -102,7 +102,7 @@ stat_df <- map(SAMPLE_ORDER, .read_samtools_stat) |> bind_rows()
 dir.create(WES_FINAL, showWarnings = FALSE, recursive = TRUE)
 stat_df |> write_tsv(file.path(WES_FINAL, "sequencing_depth.tsv"))
 
-dir.create(FIG_PATH, showWarnings = FALSE, recursive = TRUE)
+dir.create(WES_FIGURES, showWarnings = FALSE, recursive = TRUE)
 p_depth <- (
     stat_df |>
         mutate(sample = factor(sample, levels = SAMPLE_ORDER)) |>
@@ -124,7 +124,7 @@ p_depth <- (
             plot.margin  = margin(10, 20, 10, 10)
         )
 )
-ggsave(file.path(FIG_PATH, "sequencing_depth.svg"), p_depth, width = 8, height = 4)
+ggsave(file.path(WES_FIGURES, "sequencing_depth.svg"), p_depth, width = 8, height = 4)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 2. Reference data
@@ -139,7 +139,7 @@ grcm39_gene_table <- grcm39_gtf_table |>
 
 # --- Cancer gene list ---
 cancer_gene <- read_csv(
-    "data/raw/WES_20240323/cancer_list.csv",
+    CANCER_GENE_LIST,
     col_names = "oncogene"
 )
 
@@ -198,7 +198,7 @@ strain1_sample_names <- c(
 )
 strain1_samples <- map(
     strain1_sample_names,
-    \(x) .read_paired(x, con_name = "PBS_Rep3", res_path = VCF_TABLE, line_name = "line1")
+    \(x) .read_paired(x, con_name = "PBS_Rep3", res_path = SAREK_VCF_TABLE, line_name = "line1")
 ) |> set_names(strain1_sample_names)
 
 strain2_sample_names <- c(
@@ -207,7 +207,7 @@ strain2_sample_names <- c(
 )
 strain2_samples <- map(
     strain2_sample_names,
-    \(x) .read_paired(x, con_name = "NT_Rep3", res_path = VCF_TABLE, line_name = "line2")
+    \(x) .read_paired(x, con_name = "NT_Rep3", res_path = SAREK_VCF_TABLE, line_name = "line2")
 ) |> set_names(strain2_sample_names)
 
 samples <- c(strain1_samples, strain2_samples)

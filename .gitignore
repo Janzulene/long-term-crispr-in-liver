@@ -14,6 +14,7 @@ data/*
 
 # Outputs / figures
 reports/
+results/
 *.png
 *.pdf
 

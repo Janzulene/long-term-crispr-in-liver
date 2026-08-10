@@ -1,16 +1,16 @@
 # ============================================================
 # Translocation circos plots (Fig. 2L)
 #
-# Reads per-sample translocation calls and on-target sequencing
-# depth from the target sequencing pipeline output, and draws
-# circos plots (circlize) showing translocation events from the
-# targeted loci to other genomic regions, with the outer track
-# representing on-target read depth.
+# Reads per-sample final translocation tables and on-target sequencing
+# depth produced by target_analyse_2.smk, and draws circos plots
+# (circlize) showing translocation events from the targeted loci to
+# other genomic regions, with the outer track representing on-target
+# read depth.
 #
 # Usage:
-#   Rscript analysis/translocation/plot_translocation_circos.R
+#   Rscript analysis/translocation/03_plot_translocation_circos.R
 #
-# Outputs SVG files into OUTPUT_FIGS_PATH:
+# Outputs SVG files into TS_FIGURES (reports/figures/translocation):
 #   - trans_circle_{sample}_{region}.svg         (per sample x region)
 #   - sum_trans_circle_{sample}.svg              (regions pooled per sample)
 #   - sum_trans_circle_{region}.svg              (samples pooled per region)
@@ -22,6 +22,9 @@ conflicts_prefer(dplyr::filter)
 library(circlize)
 library(tidyverse)
 
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
+
 # ============================================================
 # Configuration
 # ============================================================
@@ -30,9 +33,12 @@ library(tidyverse)
 # data, not shipped with this repository; see data/README.md).
 CHROM_SIZES_PATH <- "path/to/GRCm39.chrom.sizes"
 
-# All other paths are relative to the repository root.
-TARGET_DATA_PATH <- "data/processed/targetsequence_20240501"
-OUTPUT_FIGS_PATH <- "results/translocation"
+# Per-sample final translocation tables (filter_translocation rule)
+TARGET_DATA_PATH <- TS_FINAL
+# On-target depth (on_target_depth rule)
+DEPTH_DATA_PATH <- TS_PROCESSED
+# Output figures
+OUTPUT_FIGS_PATH <- TS_FIGURES
 
 # Only report events supported by more than this many read pairs.
 MIN_N_TRANS <- 2
@@ -55,9 +61,13 @@ plot_chrom <- chrom_sizes |> mutate(start = 0) |> arrange(chrom)
 # Helper functions
 # ============================================================
 
-# Read on-target depth data for one sample and one target region.
+# Read on-target depth data for one sample and one target region
+# (forward-primer on-target region, produced by the on_target_depth rule).
 .read_depth <- function(sample_name, primer_prefix) {
-    depth_path <- glue::glue("{TARGET_DATA_PATH}/{sample_name}/.dirty/{primer_prefix}/intarget__cover.depth")
+    depth_path <- glue::glue("{DEPTH_DATA_PATH}/{sample_name}/{primer_prefix}-f/intarget__cover.depth")
+    if (!file.exists(depth_path)) {
+        return(tibble(chr = character(), pos = integer(), depth = integer()))
+    }
     read_tsv(
         depth_path,
         col_names = c("chr", "pos", "depth"),
@@ -69,49 +79,40 @@ plot_chrom <- chrom_sizes |> mutate(start = 0) |> arrange(chrom)
     )
 }
 
-# Read translocation calls for one sample and one target region.
-# The forward and reverse primers of the region are pooled, and
-# reads are aggregated into unique translocation events.
-.read_trans <- function(sample_name, primer_prefix) {
-    primer_names <- str_c(primer_prefix, c("-f", "-r"))
-
-    trans_res <- map(
-        primer_names,
-        function(primer_name) {
-            trans_res_path <- glue::glue("{TARGET_DATA_PATH}/{sample_name}/{primer_name}/translocation_stat__cover.tsv")
-            if (file.size(trans_res_path) > 1) {
-                read_tsv(
-                    trans_res_path,
-                    col_types = cols(offtarget_chr = col_character(), intarget_chr = col_character())
-                )
-            } else {
-                tibble()
-            }
-        }
-    ) |> bind_rows()
-
-    if (nrow(trans_res) > 0) {
-        sum_trans_res <- (
-            trans_res
-            |> filter(
-                first_query_breakpoint - second_query_breakpoint <= 0,
-                breakpoint_location != "between"
-            )
-            |> group_by(across(-c(qname, sequence, first_query_breakpoint, second_query_breakpoint)))
-            |> summarise(n = n(), .groups = "drop")
-            |> select(n, everything())
-        )
-    } else {
-        sum_trans_res <- tibble(
+# Read the per-sample pooled translocation table produced by the
+# filter_translocation rule (one row per unique breakpoint combination
+# with support count `n`, plus a `region` column).
+.read_trans <- function(sample_name) {
+    trans_path <- glue::glue("{TARGET_DATA_PATH}/{sample_name}/translocation_stat__cover.filtered.tsv")
+    if (!file.exists(trans_path) || file.size(trans_path) <= 1) {
+        return(tibble(
             n                        = integer(),
             intarget_chr             = character(),
+            intarget_strand          = character(),
             intarget_breakpoint_pos  = integer(),
+            intarget_breakpoint_loc  = character(),
             offtarget_chr            = character(),
-            offtarget_breakpoint_pos = integer()
-        )
+            offtarget_strand         = character(),
+            offtarget_breakpoint_pos = integer(),
+            offtarget_breakpoint_loc = character(),
+            breakpoint_location      = character(),
+            intarget_first           = logical(),
+            region                   = character()
+        ))
     }
-
-    sum_trans_res
+    read_tsv(
+        trans_path,
+        col_types = cols(
+            offtarget_chr             = col_character(),
+            intarget_chr              = col_character(),
+            region                    = col_character(),
+            intarget_strand           = col_character(),
+            offtarget_strand          = col_character(),
+            intarget_breakpoint_loc   = col_character(),
+            offtarget_breakpoint_loc  = col_character(),
+            breakpoint_location       = col_character()
+        )
+    )
 }
 
 # Draw one circos plot.
@@ -230,7 +231,7 @@ plot_trans <- function(
 
 dir.create(OUTPUT_FIGS_PATH, recursive = TRUE, showWarnings = FALSE)
 
-sample_names <- c("con_1", "con_2", "con_3", "exp_1", "exp_2", "exp_3", "tail", "pbs-1", "pbs-2")
+sample_names <- read_tsv("configs/target_sequence/samples.tsv")$sample_name
 region_list  <- c("angptl3-g4", "pcsk9-g1", "pcsk9-g3")
 
 # Mode 1: one plot per sample x region
@@ -241,7 +242,7 @@ parallel::mclapply(
         region <- x[[2]]
 
         depth_df <- .read_depth(sample_name, region)
-        trans_df <- .read_trans(sample_name, region) |> filter(n > MIN_N_TRANS)
+        trans_df <- .read_trans(sample_name) |> filter(region == .env$region, n > MIN_N_TRANS)
 
         output_path <- glue::glue("{OUTPUT_FIGS_PATH}/trans_circle_{x[[1]]}_{x[[2]]}.svg")
         svg(output_path)
@@ -281,9 +282,8 @@ parallel::mclapply(
         )
 
         trans_df <- (
-            lapply(region_list, \(region) .read_trans(sample_name, region))
-            |> bind_rows()
-            |> group_by(across(-c(n)))
+            .read_trans(sample_name)
+            |> group_by(across(-c(n, region)))
             |> summarise(n = sum(n), .groups = "drop")
             |> select(n, everything())
             |> filter(n > MIN_N_TRANS)
@@ -326,9 +326,10 @@ parallel::mclapply(
         )
 
         trans_df <- (
-            lapply(sample_names, \(sample_name) .read_trans(sample_name, region))
+            lapply(sample_names, .read_trans)
             |> bind_rows()
-            |> group_by(across(-c(n)))
+            |> filter(region == .env$region)
+            |> group_by(across(-c(n, region)))
             |> summarise(n = sum(n), .groups = "drop")
             |> select(n, everything())
             |> filter(n > MIN_N_TRANS)

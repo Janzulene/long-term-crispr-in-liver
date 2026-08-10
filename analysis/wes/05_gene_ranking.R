@@ -1,10 +1,10 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# WES2 somatic mutation analysis — step 5/6: per-gene non-synonymous ranking
+# WES somatic mutation analysis — step 5/7: per-gene non-synonymous ranking
 #
 # Ranks genes by non-synonymous mutation count and by summed allele
 # frequency (optionally scaled by gene length), computes mean-rank
 # statistics across sample groups, and saves the ranking tables and
-# plots (data/final/WES_20250105/rank_results/).
+# plots (data/final/WES/rank_results/).
 #
 # Article references:
 #   - Fig 2I: mutated genes ranked by normalized non-silent mutation
@@ -34,9 +34,8 @@ library(glue)
 library(magrittr)
 library(tidyverse)
 
-WES_PROCESSED <- "data/processed/WES_20250105_analysis"
-WES_FINAL     <- "data/final/WES_20250105"
-FIG_PATH      <- "reports/figures/WES_20250105"
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
 
 SAMPLE_ORDER <- c(
     str_c("PBS_Rep", seq(3)),
@@ -183,12 +182,12 @@ samples.hard_ratio        <- map(samples.exploded, calc_mut_status_ratio)
 samples.hard_ratio_scaled <- map(samples.exploded, \(x) calc_mut_status_ratio(x, scale_by_gene_length = TRUE))
 
 # Example ranking plot for one sample
-dir.create(FIG_PATH, showWarnings = FALSE, recursive = TRUE)
+dir.create(WES_FIGURES, showWarnings = FALSE, recursive = TRUE)
 TOP_N <- 50
 sample_name <- "Angptl3G4_Rep5"
 
 ggsave(
-    file.path(FIG_PATH, "rank_example.count.svg"),
+    file.path(WES_FIGURES, "rank_example.count.svg"),
     samples.hard_count[[sample_name]] |>
         count_plot_all(n_top = TOP_N) +
         labs(title = glue("{sample_name}: Top {TOP_N} (count)")),
@@ -196,7 +195,7 @@ ggsave(
 )
 
 ggsave(
-    file.path(FIG_PATH, "rank_example.ratio.svg"),
+    file.path(WES_FIGURES, "rank_example.ratio.svg"),
     samples.hard_ratio[[sample_name]] |>
         count_plot_all(n_top = TOP_N) +
         labs(title = glue("{sample_name}: Top {TOP_N} (ratio)")),
@@ -242,7 +241,7 @@ cancer_ratio_df <- map2(
 ) |> bind_rows()
 
 ggsave(
-    file.path(FIG_PATH, "cancer_gene_ratio.top50.svg"),
+    file.path(WES_FIGURES, "cancer_gene_ratio.top50.svg"),
     cancer_ratio_df |>
         mutate(group = SAMPLE_GROUP[sample]) |>
         ggplot() +

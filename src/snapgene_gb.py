@@ -15,7 +15,7 @@ Example
 -------
 >>> from Bio.Seq import Seq
 >>> from Bio.SeqIO import SeqRecord
->>> from snapgene_gb import create_snapgene_feature
+>>> from src.snapgene_gb import create_snapgene_feature
 >>> record = SeqRecord(Seq("ACGT" * 25), name="junction")
 >>> record.features.append(
 ...     create_snapgene_feature(0, 50, "intarget_chr1:1000-1050", color="#b6ffb6")

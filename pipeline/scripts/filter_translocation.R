@@ -6,7 +6,7 @@ conflicts_prefer(dplyr::filter)
 
 library(tidyverse)
 
-TARGET_DATA_PATH <- "data/processed/targetsequence_20240501"
+TARGET_DATA_PATH <- file.path("data/processed", snakemake@config[["project_name"]])
 
 # Read translocation calls for one sample and one target region,
 # pooling the forward and reverse primers of the region.

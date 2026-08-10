@@ -40,8 +40,8 @@ from src.config import Location
 # ============================================================
 
 DEFAULT_PARAMS = {
-    "samples_table": "configs/target_sequence_240501/samples.tsv",
-    "primers_table": "configs/target_sequence_240501/target_primers.csv",
+    "samples_table": "configs/target_sequence/samples.tsv",
+    "primers_table": "configs/target_sequence/target_primers.csv",
     "min_mapq"     : 10,
 }
 params = {**DEFAULT_PARAMS, **config}
@@ -49,15 +49,15 @@ params = {**DEFAULT_PARAMS, **config}
 COND_ENV = config.get("conda_env", "long-term-crispr-in-liver")
 
 sgRNA_list = ["angptl3_g4", "con", "pcsk9_g1", "pcsk9_g3"]
-sample_df  = pd.read_table(params["samples_table"])  # three columns: read1, read2, sample_name
+sample_df  = pd.read_table(params["samples_table"], sep="\t")  # three columns: read1, read2, sample_name
 primers_df = pd.read_csv(params["primers_table"], dtype={"chr": str})
 
 # ============================================================
 # Preprocessing inputs (outputs of target_analyse_2.smk)
 # ============================================================
 
-last_processed_dir = Location.processed_data / "targetsequence_20240501"
-processed_dir      = Location.processed_data / "targetsequence_20240501_aav"
+last_processed_dir = Location.processed_data / "targetsequence"
+processed_dir      = Location.processed_data / "targetsequence_aav"
 
 processed_read1 = str(last_processed_dir / "{sample_name}" / "fastp" / "trimmed_R1.fastq.gz")
 processed_read2 = str(last_processed_dir / "{sample_name}" / "fastp" / "trimmed_R2.fastq.gz")
@@ -88,7 +88,7 @@ rule all:
             for sgRNA in ["con", "angptl3_g4"]
         ],
         aav_insertion_plots = [
-            Path("reports/figures/targetsequence_20240501/aav2") / sample_name / f"{sgRNA}.aav_insertion.svg"
+            Path("reports/figures/aav") / sample_name / f"{sgRNA}.aav_insertion.svg"
             for sample_name in sample_df.sample_name
             for sgRNA in ["con", "angptl3_g4"]
         ],
@@ -207,9 +207,9 @@ rule plot_aav_insertion:
         genome_cov      = processed_dir / "mapping" / "{sample_name}" / "{sgRNA}.genome.filtered.coverage.txt",
         aav_cov         = processed_dir / "mapping" / "{sample_name}" / "{sgRNA}.coverage.txt"
     output:
-        full_genome_plot = Path("reports/figures/targetsequence_20240501/aav2") / "{sample_name}" / "{sgRNA}.full_genome_coverage.svg",
-        genome_plot      = Path("reports/figures/targetsequence_20240501/aav2") / "{sample_name}" / "{sgRNA}.aav_insertion.svg",
-        aav_plot         = Path("reports/figures/targetsequence_20240501/aav2") / "{sample_name}" / "{sgRNA}.aav_coverage.svg"
+        full_genome_plot = Path("reports/figures/aav") / "{sample_name}" / "{sgRNA}.full_genome_coverage.svg",
+        genome_plot      = Path("reports/figures/aav") / "{sample_name}" / "{sgRNA}.aav_insertion.svg",
+        aav_plot         = Path("reports/figures/aav") / "{sample_name}" / "{sgRNA}.aav_coverage.svg"
     conda: COND_ENV
     params:
         sample_name = "{sample_name}",

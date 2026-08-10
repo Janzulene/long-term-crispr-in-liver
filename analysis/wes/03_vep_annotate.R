@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# WES2 somatic mutation analysis — step 3/6: VEP annotation
+# WES somatic mutation analysis — step 3/7: VEP annotation
 #
 # Explodes the VEP CSQ field of the hard-filtered somatic mutations,
 # keeping a single transcript per gene (prefer CANONICAL, then
@@ -29,7 +29,8 @@ library(glue)
 library(magrittr)
 library(tidyverse)
 
-WES_PROCESSED <- "data/processed/WES_20250105_analysis"
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
 
 IMPACT_ORDER <- c("HIGH", "MODERATE", "LOW", "MODIFIER")
 

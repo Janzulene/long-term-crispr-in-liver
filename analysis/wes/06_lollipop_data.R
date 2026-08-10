@@ -1,8 +1,8 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# WES2 somatic mutation analysis — step 6/6: lollipop data assembly
+# WES somatic mutation analysis — step 6/7: lollipop data assembly
 #
 # Assembles the gene-level and CDS-level mutation detail tables used by
-# the standalone lollipop plot script (analysis/wes/plot_lollipop.R).
+# the standalone lollipop plot script (analysis/wes/07_plot_lollipop.R).
 #
 # Article references:
 #   - Lollipop figure: genomic distribution and allele frequencies of
@@ -10,13 +10,13 @@
 #     Atm, Nsd1, Trp53bp1, Atr, Fancd2)
 #
 # Outputs:
-#   - data/final/WES_20250105/mutation_detail.gene.tsv
-#   - data/final/WES_20250105/mutation_detail.cds.tsv
-#   - data/final/WES_20250105/gene_widths.tsv
+#   - data/final/WES/mutation_detail.gene.tsv
+#   - data/final/WES/mutation_detail.cds.tsv
+#   - data/final/WES/gene_widths.tsv
 #
 # Usage:
 #   Rscript analysis/wes/06_lollipop_data.R
-#   Rscript analysis/wes/plot_lollipop.R   # standalone plotting
+#   Rscript analysis/wes/07_plot_lollipop.R   # standalone plotting
 # ══════════════════════════════════════════════════════════════════════════════
 
 library(conflicted)
@@ -36,8 +36,8 @@ library(glue)
 library(magrittr)
 library(tidyverse)
 
-WES_PROCESSED <- "data/processed/WES_20250105_analysis"
-WES_FINAL     <- "data/final/WES_20250105"
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
 
 samples.exploded <- readRDS(file.path(WES_PROCESSED, "samples.exploded.rds"))
 reference        <- readRDS(file.path(WES_PROCESSED, "reference.rds"))
@@ -103,7 +103,7 @@ all_cds_df <- all_gene_df |>
 
 dir.create(WES_FINAL, showWarnings = FALSE, recursive = TRUE)
 
-# Gene widths (used by plot_lollipop.R)
+# Gene widths (used by 07_plot_lollipop.R)
 grcm39_gene_table |>
     filter(gene_name %in% goi_list) |>
     distinct(gene_name, width) |>

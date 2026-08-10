@@ -1,0 +1,9 @@
+read1	read2	sample_name
+<path-to-raw-fastq>/con_1_R1.fastq.gz	<path-to-raw-fastq>/con_1_R2.fastq.gz	con_1
+<path-to-raw-fastq>/con_2_R1.fastq.gz	<path-to-raw-fastq>/con_2_R2.fastq.gz	con_2
+<path-to-raw-fastq>/con_3_R1.fastq.gz	<path-to-raw-fastq>/con_3_R2.fastq.gz	con_3
+<path-to-raw-fastq>/exp_1_R1.fastq.gz	<path-to-raw-fastq>/exp_1_R2.fastq.gz	exp_1
+<path-to-raw-fastq>/exp_2_R1.fastq.gz	<path-to-raw-fastq>/exp_2_R2.fastq.gz	exp_2
+<path-to-raw-fastq>/exp_3_R1.fastq.gz	<path-to-raw-fastq>/exp_3_R2.fastq.gz	exp_3
+<path-to-raw-fastq>/pbs_1_R1.fastq.gz	<path-to-raw-fastq>/pbs_1_R2.fastq.gz	pbs_1
+<path-to-raw-fastq>/pbs_2_R1.fastq.gz	<path-to-raw-fastq>/pbs_2_R2.fastq.gz	pbs_2

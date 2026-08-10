@@ -10,7 +10,8 @@
 # Article references:
 #   - Fig 2L (circos plots): breakpoint validation workflow; the .gb
 #     records are used to design PCR validation primers around the
-#     detected breakpoints.
+#     detected breakpoints (input: data/final/targetsequence/translocation_stat.tsv,
+#     produced by 01_summarize_translocations.py).
 #
 # External data (not shipped with the repository):
 #   - GRCm39 reference fasta (Ensembl 110) — set GRCm39_FASTA below
@@ -41,8 +42,8 @@ from src.snapgene_gb import create_snapgene_feature
 # Download from https://www.ensembl.org and set the path here.
 GRCm39_FASTA = "path/to/GRCm39_ensembl.fa"
 
-FINAL_STAT = "data/final/targetsequence_20240501/translocation_stat.tsv"
-OUTPUT_DIR = "data/processed/trans-design"
+FINAL_STAT = "data/final/targetsequence/translocation_stat.tsv"
+OUTPUT_DIR = "data/processed/translocation_genbank"
 
 mm39_fa = pysam.FastaFile(GRCm39_FASTA)
 
@@ -143,7 +144,7 @@ def trans_to_snapgene(
 
     trans_name = (
         f"({trans_record['sample']})_"
-        f"({trans_record.primer})_"
+        f"({trans_record.region})_"
         f"({trans_record.intarget_chr}:{trans_record.intarget_breakpoint_pos}"
         "->"
         f"{trans_record.offtarget_chr}:{trans_record.offtarget_breakpoint_pos})"

@@ -16,12 +16,13 @@ This repository contains the analysis code for three modules:
 
 ```
 analysis/
-  aav/            AAV integration figures and ratio tables
-  translocation/  translocation summary tables, breakpoint GenBank export, circos plots
-  wes/            WES analysis pipeline (6 steps) + lollipop plot
+  aav/            AAV integration figures and ratio tables (steps 01-02)
+  translocation/  translocation summary tables, breakpoint GenBank export,
+                  circos plots (steps 01-03)
+  wes/            WES analysis pipeline (steps 01-07)
 configs/          example samplesheet, primer table and Snakemake config
 pipeline/         Snakemake workflows + scripts (targeted sequencing, AAV)
-src/              shared modules (Python detector + R utilities)
+src/              shared modules (Python detector + R utilities and plotting helpers)
 data/README.md    data layout and input data expectations
 environment.yml   conda environment (single-file dependency definition)
 ```
@@ -38,24 +39,24 @@ mamba env create -f environment.yml -n long-term-crispr-in-liver
 
 ```bash
 snakemake -s pipeline/target_analyse_2.smk \
-    --configfile configs/target_sequence_240501/snakemake_config.yaml \
+    --configfile configs/target_sequence/snakemake_config.yaml \
     --cores 32 --use-conda
 ```
 
 Steps: fastp trimming → BWA-MEM alignment to GRCm39 → on-target read
 filtering (primer match, strand, complexity) → translocation detection →
-short-indel counting → final translocation table
-(`data/final/targetsequence_20240501/translocation_stat__cover.filtered.tsv`).
+short-indel counting → on-target depth → final translocation table
+(`data/final/targetsequence/translocation_stat__cover.filtered.tsv`).
 
 The GRCm39 reference (Ensembl 110) is external data: set the BWA index
 path via the `genome_index` config key (see
-`configs/target_sequence_240501/snakemake_config.yaml`).
+`configs/target_sequence/snakemake_config.yaml`).
 
 ## Pipeline: AAV integration detection
 
 ```bash
 snakemake -s pipeline/target_analyse_aav.smk \
-    --configfile configs/target_sequence_240501/snakemake_config.yaml \
+    --configfile configs/target_sequence/snakemake_config.yaml \
     --cores 8 --use-conda
 ```
 
@@ -65,7 +66,7 @@ integrations at the CRISPR target sites.
 
 ## Analysis: WES somatic mutations
 
-The six steps are run in order from the repository root:
+The seven steps are run in order from the repository root:
 
 ```bash
 Rscript analysis/wes/01_load_data.R   # depth + reference + VCF loading
@@ -74,22 +75,27 @@ Rscript analysis/wes/03_vep_annotate.R    # VEP annotation explosion
 Rscript analysis/wes/04_mutation_burden.R # burden table (Table S4)
 Rscript analysis/wes/05_gene_ranking.R    # per-gene ranking (Fig 2I, Table S5)
 Rscript analysis/wes/06_lollipop_data.R   # lollipop data tables
-Rscript analysis/wes/plot_lollipop.R      # lollipop figure
+Rscript analysis/wes/07_plot_lollipop.R   # lollipop figure
 ```
 
 Intermediate results are stored as RDS files under
-`data/processed/WES_20250105_analysis/`; final tables and figures are
-written to `data/final/WES_20250105/` and `reports/figures/`.
+`data/processed/WES_analysis/`; final tables and figures are written to
+`data/final/WES/` and `reports/figures/WES/`.
 
-## Analysis: translocation / AAV result tables
+## Analysis: translocation / AAV result tables and figures
 
 ```bash
 python analysis/translocation/01_summarize_translocations.py
 python analysis/translocation/02_trans_breakpoint_genbank.py
-Rscript analysis/translocation/plot_translocation_circos.R   # Fig 2L
-Rscript analysis/aav/summarize_aav_insertion_ratio.R          # Fig 2K tables
-Rscript analysis/aav/plot_aav.R                               # Fig 2K
+Rscript analysis/translocation/03_plot_translocation_circos.R   # Fig 2L
+Rscript analysis/aav/01_summarize_aav_insertion_ratio.R          # Fig 2K tables
+Rscript analysis/aav/02_plot_aav.R                               # Fig 2K
 ```
+
+Run these scripts from the repository root. Path conventions shared by
+all R scripts are defined in `src/R/paths.R` (the Python equivalent is
+`src/config.py`); output directories carry no batch date, as the
+repository targets a single final analysis round.
 
 ## Data availability
 

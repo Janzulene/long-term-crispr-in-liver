@@ -7,7 +7,7 @@ dependencies:
   - conda-forge::biopython
   - conda-forge::ipykernel
   - conda-forge::ipython
-  - conda-forge::pandas
+  - conda-forge::pandas<3 # siuba is not yet compatible with pandas 3.x
   - conda-forge::plotnine
   - conda-forge::python
   - conda-forge::siuba

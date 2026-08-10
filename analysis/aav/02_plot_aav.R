@@ -8,9 +8,9 @@
 #   - coverage across the AAV2 vector genome
 #
 # Usage (from the repository root):
-#   Rscript analysis/aav/plot_aav.R
+#   Rscript analysis/aav/02_plot_aav.R
 #
-# Outputs SVG files into OUTPUT_FIGS_PATH/{sample}/.
+# Outputs SVG files into AAV_FIGURES/{sample}/.
 # ============================================================
 
 library(conflicted)
@@ -18,17 +18,20 @@ conflicts_prefer(dplyr::filter)
 
 library(tidyverse)
 
-# Plotting helpers (same directory): plot_genome_col(), plot_genome_col_break(),
-# scale_y_log10_plus1(), and the global chrom_sizes / CHROM_ORDER.
-source("analysis/aav/plot_genome_col.R")
+# Shared path conventions (see src/R/paths.R)
+source("src/R/paths.R")
+
+# Plotting helpers (shared library): plot_genome_col(),
+# plot_genome_col_break(), scale_y_log10_plus1(), and the global
+# chrom_sizes / CHROM_ORDER.
+source("src/R/plot_genome_col.R")
 
 # ============================================================
 # Configuration
 # ============================================================
 
-# All paths are relative to the repository root.
-OUTPUT_FIGS_PATH <- "results/aav"
-INPUT_DIR <- "data/processed/targetsequence_20240501_aav/mapping"
+OUTPUT_FIGS_PATH <- AAV_FIGURES
+INPUT_DIR <- file.path(TS_PROCESSED_AAV, "mapping")
 
 # Shared y-axis-break position for the genome coverage plots.
 Y_BREAK_VALS <- c(9000, 45000)
@@ -44,7 +47,7 @@ MC_CORES <- 8
 
 dir.create(OUTPUT_FIGS_PATH, recursive = TRUE, showWarnings = FALSE)
 
-sample_names <- c("con_1", "con_2", "con_3", "exp_1", "exp_2", "exp_3", "tail", "pbs-1", "pbs-2")
+sample_names <- read_tsv("configs/target_sequence/samples.tsv")$sample_name
 sgRNA_list <- c("con", "angptl3_g4")
 
 all_condition <- expand_grid(
