@@ -102,11 +102,6 @@ Raw sequencing data have been deposited in the CNGB Sequence Archive
 **CNP0008752**. See [`data/README.md`](data/README.md) for the expected
 local data layout and reference files.
 
-## Figure-to-script mapping
-
-*Coming soon.* A table mapping each figure/table in the paper to the
-script that produced it will be added here upon publication.
-
 ## License
 
 MIT — see [LICENSE](LICENSE).
