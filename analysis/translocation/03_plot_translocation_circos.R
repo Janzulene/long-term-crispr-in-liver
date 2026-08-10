@@ -29,8 +29,8 @@ source("src/R/paths.R")
 # Configuration
 # ============================================================
 
-# Path to the GRCm39 chromosome sizes file (external reference
-# data, not shipped with this repository; see data/README.md).
+# GRCm39 chromosome sizes file (external reference data, not shipped
+# with this repository; see data/README.md).
 CHROM_SIZES_PATH <- "path/to/GRCm39.chrom.sizes"
 
 # Per-sample final translocation tables (filter_translocation rule)

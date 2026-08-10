@@ -43,12 +43,10 @@ part of this repository; see the paper's methods for details.
 
 ## External reference files (not shipped)
 
-- GRCm39 reference genome (Ensembl 110): fasta + BWA index
-  (`bwa index` prefix, set via the `genome_index` config key) and
+- GRCm39 reference genome (Ensembl 110): fasta, BWA index and
   chromosome sizes file (for the circos plots)
 - GRCm39 gene annotation GTF (GENCODE vM33 / Ensembl 110)
-  (`GRCm39_GTF_PATH` in `analysis/wes/01_load_data.R`)
 - AAV vector sequences (`data/raw/aav/aav_{sgRNA}.fa`)
 
-Paths to these files must be set in the corresponding config / script
-headers; see the README for each pipeline.
+Paths to these files are declared as `path/to/...` placeholders in the
+scripts and configs that use them.

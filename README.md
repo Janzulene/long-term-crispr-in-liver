@@ -27,15 +27,21 @@ data/README.md    data layout and input data expectations
 environment.yml   conda environment (single-file dependency definition)
 ```
 
-## Environment
+Numbered scripts in `analysis/*/` run in ascending order; each step
+consumes the outputs of the previous one.
 
-All dependencies are defined in a single conda environment file:
+## Environment
 
 ```bash
 mamba env create -f environment.yml -n long-term-crispr-in-liver
 ```
 
-## Pipeline: targeted sequencing (translocations + indels)
+## Analyses
+
+### Targeted sequencing (translocations + indels)
+
+Runs the targeted-sequencing pipeline to detect translocations and short indels at
+the CRISPR target sites.
 
 ```bash
 snakemake -s pipeline/target_analyse_2.smk \
@@ -43,16 +49,16 @@ snakemake -s pipeline/target_analyse_2.smk \
     --cores 32 --use-conda
 ```
 
-Steps: fastp trimming → BWA-MEM alignment to GRCm39 → on-target read
-filtering (primer match, strand, complexity) → translocation detection →
-short-indel counting → on-target depth → final translocation table
-(`data/final/targetsequence/translocation_stat__cover.filtered.tsv`).
+- Input: raw FASTQ (listed in `configs/target_sequence/samples.tsv`)
+- Output: intermediates under `data/processed/targetsequence/`; final
+  translocation table at
+  `data/final/targetsequence/translocation_stat__cover.filtered.tsv`
+- Downstream analysis code: `analysis/translocation/` and `analysis/aav/`
 
-The GRCm39 reference (Ensembl 110) is external data: set the BWA index
-path via the `genome_index` config key (see
-`configs/target_sequence/snakemake_config.yaml`).
+### AAV integration detection
 
-## Pipeline: AAV integration detection
+Realigns the targeted-sequencing reads to per-sgRNA AAV vector
+references and quantifies AAV integrations at the CRISPR target sites.
 
 ```bash
 snakemake -s pipeline/target_analyse_aav.smk \
@@ -60,50 +66,41 @@ snakemake -s pipeline/target_analyse_aav.smk \
     --cores 8 --use-conda
 ```
 
-Realigns the target-sequencing reads to per-sgRNA AAV vector references
-(`data/raw/aav/aav_{sgRNA}.fa`, external data) and quantifies AAV
-integrations at the CRISPR target sites.
+- Input: trimmed reads from the targeted-sequencing pipeline; AAV
+  vector references
+- Output: `data/processed/targetsequence_aav/` and `reports/figures/aav/` (QC plots)
+- Downstream analysis code: `analysis/aav/`
 
-## Analysis: WES somatic mutations
+### WES somatic mutations
 
-The seven steps are run in order from the repository root:
+**Step 0 (external): somatic variant calling with nf-core/sarek**
 
-```bash
-Rscript analysis/wes/01_load_data.R   # depth + reference + VCF loading
-Rscript analysis/wes/02_somatic_filter.R  # somatic + hard filtering
-Rscript analysis/wes/03_vep_annotate.R    # VEP annotation explosion
-Rscript analysis/wes/04_mutation_burden.R # burden table (Table S4)
-Rscript analysis/wes/05_gene_ranking.R    # per-gene ranking (Fig 2I, Table S5)
-Rscript analysis/wes/06_lollipop_data.R   # lollipop data tables
-Rscript analysis/wes/07_plot_lollipop.R   # lollipop figure
+The WES analysis starts from Mutect2 + VEP annotated variant tables,
+produced from the raw WES FASTQ by
+[nf-core/sarek](https://nf-co.re/sarek) 3.4.2, using
+`PBS_Rep3` / `NT_Rep3` as germline references. Arrange the sarek output
+as:
+
+```
+data/processed/WES2_paired/preprocessing/markduplicates/{sample}/{sample}.depth.txt      # per-sample mean depth (samtools depth)
+data/processed/WES2_paired_annotate/annotation/mutect2/{sample}_{control}.mutect2.biallelic_VEP.ann.vcf.tsv   # Mutect2 + VEP tables
 ```
 
-Intermediate results are stored as RDS files under
-`data/processed/WES_analysis/`; final tables and figures are written to
-`data/final/WES/` and `reports/figures/WES/`.
-
-## Analysis: translocation / AAV result tables and figures
+Example (see the sarek documentation for the full command):
 
 ```bash
-python analysis/translocation/01_summarize_translocations.py
-python analysis/translocation/02_trans_breakpoint_genbank.py
-Rscript analysis/translocation/03_plot_translocation_circos.R   # Fig 2L
-Rscript analysis/aav/01_summarize_aav_insertion_ratio.R          # Fig 2K tables
-Rscript analysis/aav/02_plot_aav.R                               # Fig 2K
+nextflow run nf-core/sarek -r 3.4.2 --input samplesheet.csv \
+    --genome GRCm39 --tools mutect2 --annotate_tools vep --outdir results
 ```
 
-Run these scripts from the repository root. Path conventions shared by
-all R scripts are defined in `src/R/paths.R` (the Python equivalent is
-`src/config.py`); output directories carry no batch date, as the
-repository targets a single final analysis round.
+Downstream analysis code: `analysis/wes/`
 
 ## Data availability
 
 Raw sequencing data have been deposited in the CNGB Sequence Archive
 (CNSA) of the China National GeneBank DataBase (CNGBdb) under accession
 **CNP0008752**. See [`data/README.md`](data/README.md) for the expected
-local data layout and external reference files (GRCm39 genome, GTF,
-assembly chain, AAV vector sequences).
+local data layout and external reference files.
 
 ## Figure-to-script mapping
 
