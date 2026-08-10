@@ -1,5 +1,6 @@
 # Data
-data/
+data/*
+!data/README.md
 *.fastq
 *.fastq.gz
 *.fq
