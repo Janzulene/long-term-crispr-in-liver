@@ -1,0 +1,37 @@
+name: long-term-crispr-in-liver
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # python
+  - conda-forge::biopython
+  - conda-forge::ipykernel
+  - conda-forge::ipython
+  - conda-forge::pandas
+  - conda-forge::plotnine
+  - conda-forge::python
+  - conda-forge::siuba
+  - bioconda::bionumpy
+  - bioconda::pysam
+  - bioconda::sigprofilerassignment # mutation signature analysis
+
+  # R
+  - bioconda::bioconductor-genomeinfodb
+  - bioconda::bioconductor-genomeinfodbdata
+  - bioconda::bioconductor-genomicranges
+  - bioconda::bioconductor-rtracklayer
+  - conda-forge::radian
+  - conda-forge::r-base
+  - conda-forge::r-circlize
+  - conda-forge::r-complexupset
+  - conda-forge::r-ggrastr
+  - conda-forge::r-ggvenndiagram # venn/upset plots
+  - conda-forge::r-httpgd
+  - conda-forge::r-irkernel
+  - conda-forge::r-languageserver
+  - conda-forge::r-openxlsx
+  - conda-forge::r-tidyverse
+  - conda-forge::r-vcfr
+
+  # other software
+  - bioconda::snakemake-minimal
