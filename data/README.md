@@ -12,17 +12,17 @@ See the paper's Data Availability statement for details.
 ## Expected local layout
 
 All paths referenced by the pipelines are relative to this repository
-and follow the layout below (git-ignored, not shipped):
+and follow the layout below (raw FASTQ and pipeline outputs are
+git-ignored):
 
 ```
 data/
-├── raw/                            # input data, downloaded / copied by the user
-│   ├── <fastq from CNSA>           # targeted-sequencing libraries
+├── raw/
+│   ├── <fastq from CNSA>           # targeted-sequencing libraries (downloaded)
 │   ├── WES/
-│   │   └── cancer_list.csv         # cancer gene list used by analysis/wes/01_load_data.R
+│   │   └── cancer_list.csv         # cancer gene list
 │   └── aav/
 │       └── aav_{sgRNA}.fa          # AAV vector reference per sgRNA
-│                                   # (target_analyse_aav.smk)
 ├── processed/                      # intermediate outputs (fastp, BWA, filtering, ...)
 │   ├── targetsequence/             # translocation pipeline output
 │   ├── targetsequence_aav/         # AAV pipeline output
@@ -41,12 +41,3 @@ The `WES2_paired*` directories are produced by the external
 MarkDuplicates → Mutect2 paired tumor-normal → VEP v110) and are not
 part of this repository; see the paper's methods for details.
 
-## External reference files (not shipped)
-
-- GRCm39 reference genome (Ensembl 110): fasta, BWA index and
-  chromosome sizes file (for the circos plots)
-- GRCm39 gene annotation GTF (GENCODE vM33 / Ensembl 110)
-- AAV vector sequences (`data/raw/aav/aav_{sgRNA}.fa`)
-
-Paths to these files are declared as `path/to/...` placeholders in the
-scripts and configs that use them.

@@ -21,7 +21,7 @@
 #   min_mapq      : minimum mapping quality for AAV-mapped reads
 #
 # The AAV reference sequences are expected under
-# data/raw/aav/aav_{sgRNA}.fa (not shipped with the repository).
+# data/raw/aav/aav_{sgRNA}.fa (included in this repository).
 # ============================================================
 
 import sys

@@ -1,6 +1,9 @@
 # Data
 data/*
 !data/README.md
+
+# Shipped reference files (cancer gene list, AAV vectors)
+!data/raw/
 *.fastq
 *.fastq.gz
 *.fq

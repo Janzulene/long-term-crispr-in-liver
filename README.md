@@ -100,7 +100,7 @@ Downstream analysis code: `analysis/wes/`
 Raw sequencing data have been deposited in the CNGB Sequence Archive
 (CNSA) of the China National GeneBank DataBase (CNGBdb) under accession
 **CNP0008752**. See [`data/README.md`](data/README.md) for the expected
-local data layout and external reference files.
+local data layout and reference files.
 
 ## Figure-to-script mapping
 
