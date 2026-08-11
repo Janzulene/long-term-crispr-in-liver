@@ -68,8 +68,7 @@ snakemake -s pipeline/target_analyse_aav.smk \
 
 The WES analysis starts from Mutect2 + VEP annotated variant tables,
 produced from the raw WES FASTQ by
-[nf-core/sarek](https://nf-co.re/sarek) 3.4.2 (fastp → BWA-MEM →
-MarkDuplicates → Mutect2 paired tumor-normal → VEP v110), using
+[nf-core/sarek](https://nf-co.re/sarek) 3.4.2, using
 `PBS_Rep3` / `NT_Rep3` as germline references. Arrange the sarek output
 as:
 
@@ -85,19 +84,15 @@ nextflow run nf-core/sarek -r 3.4.2 --input samplesheet.csv \
     --genome GRCm39 --tools mutect2 --annotate_tools vep --outdir results
 ```
 
-The numbered scripts in `analysis/wes/` (01_load_data → 07_plot_lollipop)
-run in order from the repository root; each step consumes the RDS files
-written by the previous one.
+Downstream analysis code: `analysis/wes/`
 
 ### RNA analysis
 
 The RNA-seq raw data were processed with
-[nf-core/rnaseq](https://nf-co.re/rnaseq) v3.14.0 (FastQC →
-TrimGalore → STAR → MarkDuplicates → Salmon), and the resulting TPM
-matrix is provided as Supplementary file 1. Differential expression
-was analysed with limma (|log2FC| ≥ 0.585, raw P < 0.05), and key DEGs
-were functionally annotated with the DAVID web tool. This script draws
-the GO chord diagram from the limma / DAVID result tables shipped in
+[nf-core/rnaseq](https://nf-co.re/rnaseq) v3.14.0. Differential
+expression was analysed with limma, and key DEGs were functionally
+annotated with the DAVID web tool. This script draws the GO chord
+diagram from the limma / DAVID result tables shipped in
 `data/raw/rna/`:
 
 ```bash
