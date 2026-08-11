@@ -4,19 +4,12 @@ Analysis code for the study:
 
 > **Long-term in vivo CRISPR/Cas9 gene editing in liver triggers host immunity and clonal mutations in DNA damage response genes beyond off-target effects**
 
-This repository contains the analysis code for three modules:
-
-| Module | Description |
-|---|---|
-| **Translocation detection** | Detection of CRISPR/Cas9 editing-induced chromosomal translocations from transposon-mediated targeted enrichment sequencing (Tn5 tagmentation + target-specific primer enrichment) |
-| **AAV integration detection** | Detection of AAV vector genome integrations from the same targeted sequencing data |
-| **WES analysis** | Whole-exome sequencing somatic mutation analysis: filtering of Mutect2/VEP output, mutational burden, gene ranking, and visualization (e.g. lollipop plots) |
-
 ## Repository layout
 
 ```
 analysis/
   aav/            AAV integration figures and ratio tables (steps 01-02)
+  rna/            GO chord diagram of DAVID enrichment (step 01)
   translocation/  translocation summary tables, breakpoint GenBank export,
                   circos plots (steps 01-03)
   wes/            WES analysis pipeline (steps 01-07)
@@ -73,11 +66,10 @@ snakemake -s pipeline/target_analyse_aav.smk \
 
 ### WES somatic mutations
 
-**Step 0 (external): somatic variant calling with nf-core/sarek**
-
 The WES analysis starts from Mutect2 + VEP annotated variant tables,
 produced from the raw WES FASTQ by
-[nf-core/sarek](https://nf-co.re/sarek) 3.4.2, using
+[nf-core/sarek](https://nf-co.re/sarek) 3.4.2 (fastp → BWA-MEM →
+MarkDuplicates → Mutect2 paired tumor-normal → VEP v110), using
 `PBS_Rep3` / `NT_Rep3` as germline references. Arrange the sarek output
 as:
 
@@ -93,12 +85,20 @@ nextflow run nf-core/sarek -r 3.4.2 --input samplesheet.csv \
     --genome GRCm39 --tools mutect2 --annotate_tools vep --outdir results
 ```
 
-Downstream analysis code: `analysis/wes/`
+The numbered scripts in `analysis/wes/` (01_load_data → 07_plot_lollipop)
+run in order from the repository root; each step consumes the RDS files
+written by the previous one.
 
-### RNA analysis (Fig. 2G)
+### RNA analysis
 
-Plots the GO chord diagram of DAVID enrichment for key DEGs from the
-limma differential-expression and DAVID enrichment tables.
+The RNA-seq raw data were processed with
+[nf-core/rnaseq](https://nf-co.re/rnaseq) v3.14.0 (FastQC →
+TrimGalore → STAR → MarkDuplicates → Salmon), and the resulting TPM
+matrix is provided as Supplementary file 1. Differential expression
+was analysed with limma (|log2FC| ≥ 0.585, raw P < 0.05), and key DEGs
+were functionally annotated with the DAVID web tool. This script draws
+the GO chord diagram from the limma / DAVID result tables shipped in
+`data/raw/rna/`:
 
 ```bash
 Rscript analysis/rna/01_plot_go_chord.R

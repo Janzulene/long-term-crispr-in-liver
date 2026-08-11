@@ -25,7 +25,7 @@ data/
 │   │   └── aav_{sgRNA}.fa          # AAV vector reference per sgRNA
 │   └── rna/
 │       ├── Angptl3G4_vs_NT_Limma_results.csv  # limma DEG results
-│       ├── Pcsk9G1_vs_NT_Limma_results.csv    # (Fig. 2G input)
+│       ├── Pcsk9G1_vs_NT_Limma_results.csv    # limma DEG results
 │       └── GO_terms_from_DAVID.csv            # DAVID GO enrichment
 ├── processed/                      # intermediate outputs (fastp, BWA, filtering, ...)
 │   ├── targetsequence/             # translocation pipeline output
