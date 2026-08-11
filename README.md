@@ -93,14 +93,7 @@ The RNA-seq raw data were processed with
 expression was analysed with limma, and key DEGs were functionally
 annotated with the DAVID web tool. This script draws the GO chord
 diagram from the limma / DAVID result tables shipped in
-`data/raw/rna/`:
-
-```bash
-Rscript analysis/rna/01_plot_go_chord.R
-```
-
-- Input: `data/raw/rna/` (limma DEG results, DAVID GO terms)
-- Output: `reports/figures/rna/GO_chord.svg`
+`data/raw/rna/`.
 
 ## Data availability
 
