@@ -21,8 +21,12 @@ data/
 │   ├── <fastq from CNSA>           # targeted-sequencing libraries (downloaded)
 │   ├── WES/
 │   │   └── cancer_list.csv         # cancer gene list
-│   └── aav/
-│       └── aav_{sgRNA}.fa          # AAV vector reference per sgRNA
+│   ├── aav/
+│   │   └── aav_{sgRNA}.fa          # AAV vector reference per sgRNA
+│   └── rna/
+│       ├── Angptl3G4_vs_NT_Limma_results.csv  # limma DEG results
+│       ├── Pcsk9G1_vs_NT_Limma_results.csv    # (Fig. 2G input)
+│       └── GO_terms_from_DAVID.csv            # DAVID GO enrichment
 ├── processed/                      # intermediate outputs (fastp, BWA, filtering, ...)
 │   ├── targetsequence/             # translocation pipeline output
 │   ├── targetsequence_aav/         # AAV pipeline output

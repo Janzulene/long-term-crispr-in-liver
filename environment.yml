@@ -19,12 +19,14 @@ dependencies:
   - bioconda::bioconductor-genomeinfodb
   - bioconda::bioconductor-genomeinfodbdata
   - bioconda::bioconductor-genomicranges
+  - bioconda::bioconductor-goplot # GO chord diagram (RNA, Fig 2G)
   - bioconda::bioconductor-rtracklayer
   - conda-forge::radian
   - conda-forge::r-base
   - conda-forge::r-circlize
   - conda-forge::r-complexupset
   - conda-forge::r-conflicted
+  - conda-forge::r-export
   - conda-forge::r-ggrastr
   - conda-forge::r-ggvenndiagram # venn/upset plots
   - conda-forge::r-ggplotify

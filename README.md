@@ -95,6 +95,18 @@ nextflow run nf-core/sarek -r 3.4.2 --input samplesheet.csv \
 
 Downstream analysis code: `analysis/wes/`
 
+### RNA analysis (Fig. 2G)
+
+Plots the GO chord diagram of DAVID enrichment for key DEGs from the
+limma differential-expression and DAVID enrichment tables.
+
+```bash
+Rscript analysis/rna/01_plot_go_chord.R
+```
+
+- Input: `data/raw/rna/` (limma DEG results, DAVID GO terms)
+- Output: `reports/figures/rna/GO_chord.svg`
+
 ## Data availability
 
 Raw sequencing data have been deposited in the CNGB Sequence Archive
